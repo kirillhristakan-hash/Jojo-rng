@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0a0910">
+<meta name="description" content="JOJO RNG — ролл стендов, мутации, Реквием, арена и онлайн-комнаты. Фанатская игра.">
+<title>JOJO RNG — Stand Arrow Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏹</text></svg>">
+</head>
+<body>
+<div id="fx-lines" aria-hidden="true"></div>
+<div id="app">
+
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-mark">JOJO</span><span class="brand-sub">RNG</span>
+    </div>
+    <div class="wallet">
+      <div class="chip" title="Спин — основная валюта">
+        <span class="chip-ico">🌀</span><span id="sp-balance">0</span>
+      </div>
+      <div class="chip chip-heaven" id="heaven-chip" title="Наследие Небес">
+        <span class="chip-ico">☄️</span><span id="hv-balance">0</span>
+      </div>
+      <button class="icon-btn" id="btn-settings" aria-label="Настройки">⚙</button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ================= SPIN ================= -->
+    <section class="screen active" id="screen-spin">
+      <div class="stat-strip">
+        <div class="stat"><b id="luck-val">1.00×</b><small>Удача</small></div>
+        <div class="stat"><b id="rolltime-val">1.20s</b><small>Скорость</small></div>
+        <div class="stat"><b id="income-val">1.00×</b><small>Доход</small></div>
+        <div class="stat"><b id="mut-val">2.0%</b><small>Мутация</small></div>
+      </div>
+
+      <div class="roll-zone">
+        <div class="roll-aura" id="roll-aura"></div>
+        <button id="roll-btn" class="roll-btn">
+          <span class="roll-arrow">🏹</span>
+          <span class="roll-label">SPIN</span>
+          <span class="roll-cd" id="roll-cd"></span>
+        </button>
+        <div class="roll-buttons">
+          <button class="sub-btn" id="multi-btn">×5</button>
+          <button class="sub-btn" id="auto-toggle">АВТО<b class="dot" id="auto-dot"></b></button>
+          <button class="sub-btn" id="fast-toggle">ТУРБО<b class="dot" id="fast-dot"></b></button>
+        </div>
+      </div>
+
+      <div class="panel best-panel">
+        <div class="panel-head"><h3>Лучший стенд</h3><span class="hint" id="best-power">—</span></div>
+        <div id="best-card" class="best-card empty">
+          <div class="bc-emoji">❔</div>
+          <div class="bc-body">
+            <div class="bc-name">Ещё ничего не выпало</div>
+            <div class="bc-sub">Крути стрелу, чтобы найти свой стенд</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Последние роллы</h3><button class="link-btn" id="clear-feed">очистить</button></div>
+        <div id="feed" class="feed"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Задания</h3><span class="hint" id="quest-timer">—</span></div>
+        <div id="quest-list" class="quest-list"></div>
+      </div>
+    </section>
+
+    <!-- ================= INDEX ================= -->
+    <section class="screen" id="screen-index">
+      <div class="panel">
+        <div class="panel-head"><h3>Индекс стендов</h3><span class="hint" id="index-count">0 / 0</span></div>
+        <div class="index-bar"><div id="index-fill"></div></div>
+        <div class="filter-row" id="index-filter"></div>
+      </div>
+      <div id="index-grid" class="index-grid"></div>
+    </section>
+
+    <!-- ================= SHOP ================= -->
+    <section class="screen" id="screen-shop">
+      <div class="panel">
+        <div class="panel-head"><h3>Стрела и снаряжение</h3><span class="hint" id="shop-sp">0 🌀</span></div>
+        <div id="shop-list" class="shop-list"></div>
+      </div>
+
+      <div class="panel prestige-panel">
+        <div class="panel-head"><h3>Made in Heaven</h3><span class="hint">престиж</span></div>
+        <p class="muted" id="prestige-desc">Сбрось прогресс, чтобы получить Наследие Небес и постоянные бонусы.</p>
+        <div class="prestige-reward" id="prestige-reward">+0 ☄️</div>
+        <button class="wide-btn danger" id="prestige-btn">ПЕРЕРОЖДЕНИЕ</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Древо Небес</h3><span class="hint" id="tree-hv">0 ☄️</span></div>
+        <div id="tree-list" class="shop-list"></div>
+      </div>
+    </section>
+
+    <!-- ================= ARENA ================= -->
+    <section class="screen" id="screen-arena">
+      <div class="panel">
+        <div class="panel-head"><h3>Арена: Гайднтлет</h3><span class="hint" id="arena-stage">Этап 1</span></div>
+        <div id="boss-card" class="boss-card">
+          <div class="boss-emoji">🥊</div>
+          <div class="boss-body">
+            <div class="boss-name">Противник</div>
+            <div class="hp-bar"><div id="boss-hp" style="width:100%"></div></div>
+            <div class="boss-hp-text" id="boss-hp-text">0 / 0</div>
+          </div>
+        </div>
+        <button class="wide-btn" id="fight-btn">В БОЙ</button>
+        <div id="battle-log" class="battle-log"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Статистика</h3></div>
+        <div class="stat-grid" id="stats-grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Достижения</h3><span class="hint" id="ach-count">0 / 0</span></div>
+        <div id="ach-list" class="ach-list"></div>
+      </div>
+    </section>
+
+    <!-- ================= ONLINE ================= -->
+    <section class="screen" id="screen-online">
+      <div class="panel">
+        <div class="panel-head"><h3>Онлайн-комната</h3><span class="hint" id="net-status">офлайн</span></div>
+        <div id="net-offline">
+          <p class="muted">Комнаты работают напрямую между игроками (WebRTC). Хост создаёт код — остальные подключаются по нему. Сервер не нужен, поэтому игра живёт на GitHub Pages.</p>
+          <button class="wide-btn" id="host-btn">СОЗДАТЬ КОМНАТУ</button>
+          <div class="join-row">
+            <input id="join-code" class="text-input" placeholder="КОД КОМНАТЫ" maxlength="8" autocomplete="off" spellcheck="false">
+            <button class="wide-btn slim" id="join-btn">ВОЙТИ</button>
+          </div>
+          <div class="net-err" id="net-err"></div>
+        </div>
+
+        <div id="net-online" class="hidden">
+          <div class="room-code-row">
+            <div>Код комнаты: <b id="room-code">—</b></div>
+            <button class="link-btn" id="copy-code">копировать</button>
+            <button class="link-btn danger-text" id="leave-room">выйти</button>
+          </div>
+          <div class="players-head">Игроки <span id="player-count">1</span></div>
+          <div id="players" class="players"></div>
+        </div>
+      </div>
+
+      <div class="panel hidden" id="raid-panel-wrap">
+        <div class="panel-head"><h3>Рейд: Heaven Ascension</h3><span class="hint" id="raid-lvl">Lv.1</span></div>
+        <div class="boss-card raid">
+          <div class="boss-emoji">👁️</div>
+          <div class="boss-body">
+            <div class="boss-name" id="raid-name">DIO Over Heaven</div>
+            <div class="hp-bar"><div id="raid-hp" style="width:100%"></div></div>
+            <div class="boss-hp-text" id="raid-hp-text">—</div>
+          </div>
+        </div>
+        <button class="wide-btn" id="raid-attack">АТАКОВАТЬ</button>
+      </div>
+
+      <div class="panel hidden" id="chat-panel">
+        <div class="panel-head"><h3>Чат комнаты</h3></div>
+        <div id="chat-log" class="chat-log"></div>
+        <div class="chat-row">
+          <input id="chat-input" class="text-input" placeholder="Сообщение..." maxlength="120" autocomplete="off">
+          <button class="wide-btn slim" id="chat-send">▶</button>
+        </div>
+      </div>
+
+      <div class="panel hidden" id="netfeed-panel">
+        <div class="panel-head"><h3>Лента роллов</h3></div>
+        <div id="net-feed" class="feed"></div>
+      </div>
+    </section>
+  </main>
+
+  <nav id="nav">
+    <button class="nav-btn active" data-screen="spin"><span>🏹</span><small>Спин</small></button>
+    <button class="nav-btn" data-screen="index"><span>📖</span><small>Индекс</small></button>
+    <button class="nav-btn" data-screen="shop"><span>🛒</span><small>Магазин</small></button>
+    <button class="nav-btn" data-screen="arena"><span>⚔️</span><small>Арена</small></button>
+    <button class="nav-btn" data-screen="online"><span>🌐</span><small>Онлайн</small></button>
+  </nav>
+</div>
+
+<!-- ================= REVEAL ================= -->
+<div class="overlay hidden" id="reveal">
+  <div class="reveal-bg" id="rv-bg"></div>
+  <div class="speedlines" id="rv-lines"></div>
+  <div class="rv-card" id="rv-card">
+    <div class="rv-rarity" id="rv-rarity">COMMON</div>
+    <div class="rv-emoji" id="rv-emoji">❔</div>
+    <div class="rv-name" id="rv-name">—</div>
+    <div class="rv-mut hidden" id="rv-mut">—</div>
+    <div class="rv-quote" id="rv-quote">—</div>
+    <div class="rv-stats" id="rv-stats"></div>
+    <div class="rv-power"><span>СИЛА</span><b id="rv-power">0</b></div>
+    <div class="rv-actions">
+      <button class="wide-btn slim" id="rv-continue">ДАЛЬШЕ</button>
+    </div>
+  </div>
+  <div class="rv-counter" id="rv-counter"></div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div class="overlay hidden" id="modal">
+  <div class="modal-card">
+    <div class="modal-head"><h3 id="modal-title">Настройки</h3><button class="icon-btn" id="modal-close">✕</button></div>
+    <div id="modal-body" class="modal-body"></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+<div id="timefreeze" aria-hidden="true"><span>時</span><span>止</span><span>ま</span><span>れ</span></div>
+
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js" onerror="window.__peerFail=true"></script>
+<script src="data.js"></script>
+<script src="game.js"></script>
+<script src="net.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
